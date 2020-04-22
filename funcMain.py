@@ -5,6 +5,7 @@ import json
 import os
 import time
 import random
+import numpy as np
 
 def pull_stock_data(Stock_No, date, proxy_dict):
     #https://www.twse.com.tw/exchangeReport/STOCK_DAY_AVG?response=json&date=20200401&stockNo=0050
@@ -66,13 +67,37 @@ def init_stock_data(Stock_No_Array, proxy_source_dict):
                 except:
                     print("Error in sql insert "+ _price_date_transformed)
                     
-def Transaction_Strategy_BBand(DB, stock_No, yesterday_date):
+def Transaction_Strategy_BBand(DB, stock_No, yesterday_date, today_price):
     date_range = []
     datetime_yesterday = datetime.datetime.strptime(yesterday_date, "%Y%m%d")
 
-    for i in range(20):
-        datetime_yesterday -= datetime.timedelta(days=1)
-        date_range.append(datetime_yesterday.strftime("%Y%m%d"))
-
     _command = "select Date, Daily_Price_Mean from Stock_" + str(stock_No)
-    return bt.selectTableFromDB(DB, "Stock_"+stock_No, _command)
+    _data = bt.selectTableFromDB(DB, "Stock_"+stock_No, _command)
+    _data_dict = {}
+    _price_array = []
+
+    #to dict
+    for data_array in _data:
+        if data_array[0] not in _data_dict:
+            _data_dict[data_array[0]] = float(data_array[1])
+            
+    for i in range(20):
+        while True:
+            datetime_yesterday -= datetime.timedelta(days=1)
+            _today = datetime_yesterday.strftime("%Y%m%d")
+            if _today in _data_dict:
+                _price_array.append(_data_dict[_today])
+                break
+    _price_std = np.std(_price_array)
+    if today_price >= np.mean(_price_array) - 1*_price_std:
+        return "Buy"
+    elif np.mean(_price_array) - float(today_price) >= 0.5:
+        return "Sell"
+    elif today_price >= np.mean(_price_array) - _price_std:
+        return "Sell_Half"
+    elif np.mean(_price_array) - 2*_price_std <= today_price:
+        return "Buy_More"
+    elif np.mean(_price_array) + 1*_price_std >= today_price:
+        return "Sell_Half"
+    else :
+        return "Hold"
