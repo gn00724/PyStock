@@ -68,6 +68,5 @@ for _t, keys in enumerate(_key_array_sort[30:]):
 plt.plot(G_Plt_X, G_Plt_Y)
 plt.savefig('./foo.png', dpi=100)
 print(G_Start_Money, G_Stock_Hold, int(G_Start_Money+G_Stock_Hold*G_Last_Price))
-        
-
+print("R = ", fm.ratings_reckon(1000000, int(G_Start_Money+G_Stock_Hold*G_Last_Price), -1, 1, 17))  
 

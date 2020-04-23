@@ -6,6 +6,7 @@ import os
 import time
 import random
 import numpy as np
+import math
 
 def pull_stock_data(Stock_No, date, proxy_dict):
     #https://www.twse.com.tw/exchangeReport/STOCK_DAY_AVG?response=json&date=20200401&stockNo=0050
@@ -64,6 +65,7 @@ def init_stock_data(Stock_No_Array, proxy_source_dict):
                     bt.insertData("Tw_Stock_Price_Per_Day", "Stock_"+str(_stock),\
                         list(_db_table_formats.keys()), \
                         [_price_date_transformed, _price])
+                        print("insert works ", + _price_date_transformed)
                 except:
                     print("Error in sql insert "+ _price_date_transformed)
                     
@@ -91,13 +93,28 @@ def Transaction_Strategy_BBand(DB, stock_No, yesterday_date, today_price):
     _price_std = np.std(_price_array)
     if today_price >= np.mean(_price_array) - 1*_price_std:
         return "Buy"
+    elif today_price >= np.mean(_price_array) - 2*_price_std:
+        return "Buy_More"
+
     elif np.mean(_price_array) - float(today_price) >= 0.5:
         return "Sell"
-    elif today_price >= np.mean(_price_array) - _price_std:
-        return "Sell_Half"
-    elif np.mean(_price_array) - 2*_price_std <= today_price:
-        return "Buy_More"
     elif np.mean(_price_array) + 1*_price_std >= today_price:
         return "Sell_Half"
-    else :
+    else:
         return "Hold"
+
+def ratings_reckon(origin_number, last_number, ratings, period, years):
+    #last_number = origin_number * power((1+ ratings/period), period*years)
+    if origin_number == -1:
+        origin_number = last_number/ math.pow((1+ ratings/(period*years)), period*years)
+    if last_number == -1:
+        last_number = origin_number * math.pow(1+ ratings/(period*years), period*years)
+    if ratings == -1:
+        ratings = (math.exp(math.log(last_number/origin_number)/(period*years)) -1) * (period*years)
+            
+    return {
+        "origin_number": origin_number,
+        "last_number" : last_number,
+        "ratings" : ratings
+    }
+
