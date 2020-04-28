@@ -65,7 +65,7 @@ def init_stock_data(Stock_No_Array, proxy_source_dict):
                     bt.insertData("Tw_Stock_Price_Per_Day", "Stock_"+str(_stock),\
                         list(_db_table_formats.keys()), \
                         [_price_date_transformed, _price])
-                        print("insert works ", + _price_date_transformed)
+                    print("insert works ", + _price_date_transformed)
                 except:
                     print("Error in sql insert "+ _price_date_transformed)
                     
@@ -117,4 +117,5 @@ def ratings_reckon(origin_number, last_number, ratings, period, years):
         "last_number" : last_number,
         "ratings" : ratings
     }
+
 
