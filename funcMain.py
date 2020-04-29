@@ -103,14 +103,14 @@ def Transaction_Strategy_BBand(DB, stock_No, yesterday_date, today_price):
     else:
         return "Hold"
 
-def ratings_reckon(origin_number, last_number, ratings, period, years):
+def ratings_reckon(origin_number, last_number, ratings, years):
     #last_number = origin_number * power((1+ ratings/period), period*years)
     if origin_number == -1:
-        origin_number = last_number/ math.pow((1+ ratings/(period*years)), period*years)
+        origin_number = last_number/ math.pow((1+ ratings/1), years)
     if last_number == -1:
-        last_number = origin_number * math.pow(1+ ratings/(period*years), period*years)
+        last_number = origin_number * math.pow((1+ ratings/1), years)
     if ratings == -1:
-        ratings = (math.exp(math.log(last_number/origin_number)/(period*years)) -1) * (period*years)
+        ratings = ((math.exp(math.log(last_number/origin_number)/(years)))-1) * (1)
             
     return {
         "origin_number": origin_number,
