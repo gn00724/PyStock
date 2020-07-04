@@ -4,8 +4,8 @@ import funcMain as fm
 import numpy as np
 import matplotlib.pyplot as plt
 
-G_Search_Stock_Array = ["1210"]
-
+G_Search_Stock_Array = ["1210", "0050", "0056", "2317", "2382","2330","3008"]
+G_Search_Stock_Array = ["2382"]
 for _stock_no_in_array in G_Search_Stock_Array:
     G_Translation_Fee = 0.14 / 100
     G_Start_Money = 1000000
@@ -27,10 +27,10 @@ for _stock_no_in_array in G_Search_Stock_Array:
     G_Last_Price = 0
 
     #to dict
-    for _t, keys in enumerate(_key_array_sort[30:]):
-        print(_t/len(_key_array_sort[30:]))
+    for _t, keys in enumerate(_key_array_sort[200:]):
+        print(_t/len(_key_array_sort[200:]))
         _data = G_dict_from_pass_start[keys]
-        call_bool = fm.Transaction_Strategy_BBand("Tw_Stock_Price_Per_Day", _stock_no_in_array, _data[0], _data[1])
+        call_bool = fm.Transaction_Strategy_OverHighestScore("Tw_Stock_Price_Per_Day", _stock_no_in_array, _data[0], _data[1])
         stock_price = float(_data[1]) * 1000 + float(_data[1]) * G_Translation_Fee
         G_Last_Price = float(_data[1]) * 1000
         if call_bool == "Buy" and G_Start_Money >= stock_price:
@@ -52,6 +52,7 @@ for _stock_no_in_array in G_Search_Stock_Array:
                 _buy_descions = 2
             elif _count_can_buy == 1:
                 _buy_descions = 1
+
             G_Start_Money -= stock_price*_buy_descions
             G_Stock_Hold += _buy_descions
         G_Plt_X.append(str(_data[0]))
@@ -60,11 +61,12 @@ for _stock_no_in_array in G_Search_Stock_Array:
 
     plt.plot(G_Plt_X, G_Plt_Y)
     plt.savefig('./Output/'+_stock_no_in_array+".png", dpi=100)
+    plt.close()
 
     _stock_results = str(G_Start_Money)+", "+\
                     str(G_Stock_Hold)+", "+\
                     str(int(G_Start_Money+G_Stock_Hold*G_Last_Price))
-    _stock_ratings = "R = "+str(fm.ratings_reckon(1000000, int(G_Start_Money+G_Stock_Hold*G_Last_Price), -1, 1, 17))
+    _stock_ratings = "R = "+str(fm.ratings_reckon(1000000, int(G_Start_Money+G_Stock_Hold*G_Last_Price), -1, 17))
 
     bt.txtCreater(_stock_no_in_array, _stock_results, "./Output/")
     bt.txtCreater(_stock_no_in_array+"_ratings", _stock_ratings, "./Output/")

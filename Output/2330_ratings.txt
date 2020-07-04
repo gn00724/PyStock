@@ -1,0 +1,1 @@
+R = {'origin_number': 1000000, 'last_number': 1463548, 'ratings': 0.022656591192032227}
